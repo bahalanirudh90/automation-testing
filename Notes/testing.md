@@ -113,17 +113,58 @@
 
 - Based on Code Visibility :
     1. White-Box Testing :
-        - Tests the internal code structure, logic, and paths.
-        - Focuses on code coverage, control flow, and data flow.
-        - Example: A developer writes a unit test to ensure every `if-else` branch in a function is executed.
+        - **What it is**: Testing with full knowledge of the internal code structure, logic, and paths. Also known as clear-box or glass-box testing.
+        - **Who does it**: Primarily developers during unit testing.
+        - **Goal**: To ensure all internal paths of the code are exercised and to verify the flow of inputs and outputs through the application.
+        - **Common Techniques**:
+            - **Statement Coverage**: Aims to execute every single statement in the source code at least once.
+            - **Branch Coverage (Decision Coverage)**: Aims to test every possible branch (e.g., `if-else`, `case`) from each decision point.
+            - **Path Coverage**: Aims to test every possible path from the start to the end of a function. This is the most comprehensive but often impractical due to the high number of paths.
+        - **Real Example**: Consider this Java function:
+            ```java
+            public String getTicketPrice(int age, boolean isStudent) {
+                if (age < 18) {
+                    return "$10"; // Path 1
+                } else if (isStudent) {
+                    return "$12"; // Path 2
+                } else {
+                    return "$15"; // Path 3
+                }
+            }
+            ```
+            - **Statement Coverage**: A single test like `getTicketPrice(17, false)` would cover the first branch and achieve statement coverage for the first `if` block, but not the others.
+            - **Branch Coverage**: You would need at least two tests: `getTicketPrice(17, false)` to cover the `age < 18` branch, and `getTicketPrice(20, true)` to cover the `isStudent` branch. To be thorough, `getTicketPrice(25, false)` would cover the final `else` branch.
     2. Black-Box Testing :
-        - Tests the application's functionality without seeing the internal code.
-        - Focuses on inputs and outputs, treating the system as a "black box."
-        - Example: Testing a login form by entering valid and invalid credentials and checking the outcome, without knowing how the validation is coded.
+        - **What it is**: Testing the application's functionality without any knowledge of the internal code. The focus is solely on inputs and expected outputs.
+        - **Who does it**: Primarily QA testers.
+        - **Goal**: To verify that the system meets functional requirements from a user's perspective.
+        - **Common Techniques**:
+            - **Equivalence Partitioning**: Divides input data into partitions of equivalent data. If one test case from a partition passes, it's assumed all others in that partition will also pass.
+            - **Boundary Value Analysis (BVA)**: A technique that focuses on testing the "boundaries" between partitions. Defects often cluster around boundaries.
+            - **Decision Table Testing**: Used for complex business logic where the output depends on multiple combinations of inputs.
+        - **Real Example**: An input field for a discount accepts ages from 18 to 60.
+            - **Equivalence Partitioning**:
+                - Partition 1 (Invalid): `age < 18` (e.g., test with `10`)
+                - Partition 2 (Valid): `18 <= age <= 60` (e.g., test with `35`)
+                - Partition 3 (Invalid): `age > 60` (e.g., test with `70`)
+            - **Boundary Value Analysis**:
+                - Test the edges of the valid partition: `17, 18, 19` and `59, 60, 61`. This checks for common "off-by-one" errors.
     3. Grey-Box Testing :
-        - A mix of White-Box and Black-Box; the tester has partial knowledge of the internal system.
-        - Focuses on testing interactions between components with some understanding of the underlying data structures or algorithms.
-        - Example: An integration test where the tester knows how the database is structured to create specific test data, but tests the application through the UI.
+        - **What it is**: A mix of White-Box and Black-Box testing where the tester has partial knowledge of the internal system (e.g., access to databases or design documents).
+        - **Who does it**: Can be done by developers or QA testers with access to design documents or databases.
+        - **Goal**: To find defects related to improper code structure or usage, often in integration scenarios.
+        - **Common Techniques (especially for Integration Testing)**:
+            - **Top-Down Integration**: Testing starts from the top-level modules and moves downwards. Lower-level modules that are not yet developed are replaced with **Stubs** (dummy code that simulates the module).
+            - **Bottom-Up Integration**: Testing starts from the lowest-level modules and moves upwards. Higher-level modules that call the unit being tested are replaced with **Drivers** (dummy code that calls the lower-level module).
+        - **Grey-Box Real Example**:
+            - **Scenario**: Testing a "Create User" feature on a website.
+            - **Black-Box part**: The tester uses the UI to fill out the registration form and clicks "Submit". They then try to log in with the new user's credentials.
+            - **White-Box part**: The tester has access to the database. After submitting the form, they write a SQL query to directly check the `users` table.
+            - **Grey-Box Test**: The tester verifies not just that the login works, but also that:
+                - The `creation_date` column in the database was correctly set to the current timestamp.
+                - The `password` field was properly hashed and not stored in plain text.
+                - The `user_status` is correctly set to 'pending_verification'.
+            This approach finds defects that are not visible purely through the UI.
 
 ## Software Development Life Cycle (SDLC)
 - The SDLC is a structured process that defines the tasks performed at each step in the software development process. It provides a framework for planning, creating, testing, and deploying high-quality software.
@@ -160,6 +201,34 @@
         - Combines elements of the iterative model with the risk analysis of the Waterfall model. It's used for large, complex, and high-risk projects.
         - **Pros**: Excellent for risk management.
         - **Cons**: Very complex and can be expensive.
+
+## Key Scrum Terminologies for Testers
+- Since most teams use the **Agile** model, understanding the language of **Scrum** (the most popular Agile framework) is essential.
+    - **Sprint**: A short, time-boxed period (usually 1-4 weeks) where the team works to complete a set amount of work.
+    - **Product Backlog**: A prioritized list of all features, enhancements, and fixes desired for the product. It's the single source of requirements.
+    - **Sprint Backlog**: A subset of items from the Product Backlog that the team commits to completing in a specific Sprint.
+    - **User Story**: A short, simple description of a feature from the perspective of the user. It follows the format: "As a [type of user], I want [some goal] so that [some reason]."
+    - **Definition of Done (DoD)**: A formal checklist of criteria that a User Story must meet to be considered "done." For a tester, this is critical and often includes "All acceptance tests passed," "Regression tests passed," and "No critical bugs found."
+    - **Daily Stand-up (or Daily Scrum)**: A short (15-minute) daily meeting for the team to sync up. Each member answers: What did I do yesterday? What will I do today? What impediments are in my way?
+    - **Sprint Review**: A meeting at the end of the Sprint where the team demonstrates what they accomplished (the working software) to stakeholders to get feedback.
+    - **Sprint Retrospective**: A meeting at the end of the Sprint for the team to reflect internally on the process. They discuss what went well, what didn't, and what to improve for the next Sprint.
+
+## Test Metrics
+- Test metrics are quantitative measures that help monitor and control the software testing process. They provide insights into the quality of the product, the effectiveness of the testing, and the overall progress.
+    - **Test Coverage**: The percentage of requirements, code, or features that are covered by test cases. (e.g., "We have 90% code coverage from our unit tests.")
+        - **Formula**: `(Number of items covered / Total number of items) * 100`
+    - **Defect Density**: The number of confirmed defects found in a component or system, divided by the size of that component (e.g., measured in lines of code or function points). It helps identify which modules are the most buggy.
+        - **Formula**: `Total number of defects / Size of the software module`
+    - **Defect Leakage**: The percentage of defects that were missed in a testing phase and found in a later phase (or by the customer). A high leakage from QA to Production is a major red flag.
+        - **Formula**: `(Defects found in a later phase / (Defects found in current phase + Defects found in later phase)) * 100`. For example, leakage from QA to UAT is `(Defects in UAT / (Defects in QA + Defects in UAT)) * 100`.
+    - **Test Execution Rate**: The percentage of test cases that have been executed out of the total number of planned tests.
+        - **Formula**: `(Number of executed tests / Total number of tests) * 100`
+    - **Test Pass Rate**: The percentage of tests that passed out of the total number of executed tests.
+        - **Formula**: `(Number of passed tests / Number of executed tests) * 100`
+    - **Mean Time To Detect (MTTD)**: The average time it takes to discover a defect from the moment it was introduced.
+        - **Formula**: `Sum of (Time of Detection - Time of Introduction) for all defects / Total number of defects`
+    - **Mean Time To Repair (MTTR)**: The average time it takes to fix a defect once it has been identified.
+        - **Formula**: `Sum of (Time of Resolution - Time of Reporting) for all defects / Total number of defects`
 
 ## Software Testing Life Cycle (STLC)
 - A systematic process to ensure software quality. It defines the steps to be performed in a specific order during testing.
